@@ -3,812 +3,1767 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Windsurf vs Claude Code — 2025 Battle</title>
+<title>Windsurf vs Claude Code — 2025 Professional Comparison</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --ws:#7c6fe0;--ws2:#b8aff8;--wsglow:rgba(124,111,224,.5);
-  --cc:#ff6b35;--cc2:#ffa96b;--ccglow:rgba(255,107,53,.5);
-  --bg:#03030a;--s1:#0a0a18;--s2:#0d0d1e;
-  --text:rgba(255,255,255,.85);--dim:rgba(255,255,255,.35);--vdim:rgba(255,255,255,.12);
+/* ─────────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────────── */
+:root {
+  --bg:       #0b0b0e;
+  --bg2:      #101014;
+  --bg3:      #15151a;
+  --border:   rgba(255,255,255,.07);
+  --border2:  rgba(255,255,255,.12);
+  --text:     #f0f0f0;
+  --muted:    rgba(240,240,240,.45);
+  --faint:    rgba(240,240,240,.15);
+
+  --ws:       #3b6dff;
+  --ws-light: #7ea3ff;
+  --ws-dim:   rgba(59,109,255,.12);
+  --ws-glow:  rgba(59,109,255,.22);
+
+  --cc:       #00b07a;
+  --cc-light: #4dd9a8;
+  --cc-dim:   rgba(0,176,122,.12);
+  --cc-glow:  rgba(0,176,122,.22);
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Outfit', 'Helvetica Neue', sans-serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+
+  --radius-sm: 8px;
+  --radius:    14px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;cursor:none}
 
-/* CURSOR */
-#cursor{position:fixed;width:12px;height:12px;border-radius:50%;background:#fff;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .2s,height .2s}
-#cursor-ring{position:fixed;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.3);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .12s ease}
+/* ─────────────────────────────────────────────
+   RESET & BASE
+───────────────────────────────────────────── */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { scroll-behavior:smooth }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;justify-content:space-between;align-items:center;background:rgba(3,3,10,.6);backdrop-filter:blur(24px);border-bottom:1px solid var(--vdim)}
-.nav-title{font-size:13px;font-family:'Space Mono',monospace;color:var(--dim);letter-spacing:.1em}
-.nav-pill{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:100px;background:var(--s1);border:1px solid var(--vdim);font-size:12px;color:var(--dim)}
-.nav-dot{width:7px;height:7px;border-radius:50%;animation:pulse 2s infinite}
-.ws-ndot{background:var(--ws)}
-.cc-ndot{background:var(--cc);animation-delay:.5s}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+/* noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: .6;
+}
 
-/* HERO */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px 60px;position:relative;overflow:hidden}
+/* subtle grid pattern */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+  z-index: 0;
+}
 
-#hero-canvas{position:absolute;inset:0;z-index:0}
+/* ─────────────────────────────────────────────
+   CURSOR
+───────────────────────────────────────────── */
+* { cursor: none !important }
+#cur {
+  position: fixed;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--text);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width .15s, height .15s, background .2s;
+}
+#cur-o {
+  position: fixed;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.2);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: all .1s ease;
+}
 
-.hero-inner{position:relative;z-index:2;text-align:center;max-width:900px}
+/* ─────────────────────────────────────────────
+   NAV
+───────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 56px;
+  background: rgba(11,11,14,.75);
+  backdrop-filter: blur(28px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+}
+.nav-wordmark {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-wordmark span { color: var(--muted) }
 
-.year-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:100px;background:rgba(255,255,255,.04);border:1px solid var(--vdim);font-family:'Space Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:.15em;margin-bottom:48px;text-transform:uppercase}
-.badge-spark{font-size:14px}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: .02em;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--text) }
 
-.hero-logos{display:flex;align-items:center;justify-content:center;gap:32px;margin-bottom:40px}
-.logo-block{display:flex;flex-direction:column;align-items:center;gap:10px}
-.logo-orb{width:80px;height:80px;border-radius:24px;display:flex;align-items:center;justify-content:center;position:relative}
-.ws-orb{background:linear-gradient(135deg,#4a3fa0,#7c6fe0);box-shadow:0 0 60px var(--wsglow),0 0 120px rgba(124,111,224,.15)}
-.cc-orb{background:linear-gradient(135deg,#cc4400,#ff6b35);box-shadow:0 0 60px var(--ccglow),0 0 120px rgba(255,107,53,.15)}
-.logo-orb::after{content:'';position:absolute;inset:-2px;border-radius:26px;background:inherit;filter:blur(16px);opacity:.4;z-index:-1}
-.logo-name{font-size:14px;font-weight:600;letter-spacing:.02em}
-.ws-name{color:var(--ws2)}
-.cc-name{color:var(--cc2)}
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  text-decoration: none;
+  transition: all .2s;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  background: transparent;
+}
+.pill:hover { background: rgba(255,255,255,.05); color: var(--text) }
+.pill-ws { border-color: rgba(59,109,255,.4); color: var(--ws-light) }
+.pill-ws:hover { background: var(--ws-dim); color: var(--ws-light) }
+.pill-cc { border-color: rgba(0,176,122,.4); color: var(--cc-light) }
+.pill-cc:hover { background: var(--cc-dim); color: var(--cc-light) }
 
-.vs-center{display:flex;flex-direction:column;align-items:center;gap:0}
-.vs-text{font-size:11px;font-family:'Space Mono',monospace;color:var(--vdim);letter-spacing:.3em}
-.vs-line{width:1px;height:40px;background:linear-gradient(to bottom,transparent,var(--vdim),transparent)}
+/* ─────────────────────────────────────────────
+   HERO — FULL VIEWPORT
+───────────────────────────────────────────── */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1;
+}
 
-.hero-h1{font-size:clamp(56px,9vw,108px);font-weight:700;letter-spacing:-.05em;line-height:.95;margin-bottom:28px}
-.split-line{display:block;overflow:hidden}
-.split-ws{background:linear-gradient(135deg,var(--ws),var(--ws2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.split-cc{background:linear-gradient(135deg,var(--cc),var(--cc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* full-bleed gradient bg */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 60%, rgba(59,109,255,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 40%, rgba(0,176,122,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 80% at 50% 100%, rgba(59,109,255,.04) 0%, transparent 60%),
+    var(--bg);
+}
 
-.hero-desc{font-size:18px;color:var(--dim);max-width:520px;margin:0 auto 48px;line-height:1.65;font-weight:300}
+/* diagonal divider line */
+.hero-diag {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero-diag svg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+}
 
-.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.cta-btn{padding:15px 32px;border-radius:14px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif}
-.cta-ws{background:linear-gradient(135deg,var(--ws),var(--ws2));color:#fff;box-shadow:0 8px 32px var(--wsglow)}
-.cta-ws:hover{transform:translateY(-3px);box-shadow:0 16px 48px var(--wsglow)}
-.cta-cc{background:linear-gradient(135deg,var(--cc),var(--cc2));color:#fff;box-shadow:0 8px 32px var(--ccglow)}
-.cta-cc:hover{transform:translateY(-3px);box-shadow:0 16px 48px var(--ccglow)}
-.cta-ghost{background:rgba(255,255,255,.05);color:var(--text);border:1px solid var(--vdim)}
-.cta-ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+/* animated scan line */
+.scanline {
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(59,109,255,.4) 30%, rgba(0,176,122,.4) 70%, transparent 100%);
+  animation: scan 8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes scan {
+  0%   { top: 20%; opacity: 0 }
+  10%  { opacity: 1 }
+  90%  { opacity: .6 }
+  100% { top: 80%; opacity: 0 }
+}
 
-/* SCROLL INDICATOR */
-.scroll-ind{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;opacity:.4}
-.scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,rgba(255,255,255,.5),transparent);animation:scrollLine 2s ease-in-out infinite}
-@keyframes scrollLine{0%,100%{transform:scaleY(1);opacity:.4}50%{transform:scaleY(.6);opacity:.1}}
-.scroll-text{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 40px;
+  max-width: 1100px;
+  width: 100%;
+}
 
-/* TICKER */
-.ticker{overflow:hidden;padding:14px 0;border-top:1px solid var(--vdim);border-bottom:1px solid var(--vdim);background:rgba(255,255,255,.01);position:relative;z-index:1}
-.ticker-inner{display:flex;gap:0;animation:tick 40s linear infinite;width:max-content}
-.ticker-item{padding:0 28px;font-family:'Space Mono',monospace;font-size:11px;color:var(--vdim);white-space:nowrap;letter-spacing:.05em}
-.ticker-item .hl{color:rgba(255,255,255,.5)}
-@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 36px;
+}
+.eyebrow-line {
+  width: 32px;
+  height: 1px;
+  background: var(--faint);
+}
 
-/* SECTIONS */
-.section{padding:100px 48px;max-width:1200px;margin:0 auto}
-.section-full{padding:100px 0;overflow:hidden}
+.hero-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  margin-bottom: 44px;
+}
+.brand-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.brand-mark {
+  width: 76px; height: 76px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.ws-mark {
+  background: var(--bg3);
+  border: 1px solid rgba(59,109,255,.3);
+  box-shadow: 0 0 0 1px rgba(59,109,255,.08), 0 24px 48px rgba(0,0,0,.6);
+}
+.cc-mark {
+  background: var(--bg3);
+  border: 1px solid rgba(0,176,122,.3);
+  box-shadow: 0 0 0 1px rgba(0,176,122,.08), 0 24px 48px rgba(0,0,0,.6);
+}
+.brand-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.ws-name { color: var(--ws-light) }
+.cc-name { color: var(--cc-light) }
 
-.label{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
-.h2{font-size:clamp(36px,5vw,60px);font-weight:700;letter-spacing:-.04em;line-height:1.05;margin-bottom:14px}
-.sub{font-size:17px;color:var(--dim);max-width:520px;line-height:1.65;font-weight:300;margin-bottom:56px}
+.vs-glyph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.vs-rule { width: 1px; height: 44px; background: var(--border2) }
+.vs-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
 
-/* ARENA */
-.arena{display:grid;grid-template-columns:1fr auto 1fr;gap:0;border-radius:28px;overflow:hidden;border:1px solid var(--vdim)}
-.arena-col{padding:44px 40px;background:var(--s1)}
-.arena-ws{border-right:1px solid var(--vdim)}
-.arena-divider{width:80px;background:var(--s1);display:flex;align-items:center;justify-content:center;position:relative}
-.arena-divider::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--vdim)}
-.vs-pill{width:48px;height:48px;border-radius:50%;background:var(--bg);border:1px solid var(--vdim);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--dim);z-index:1;position:relative}
+.hero-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(58px, 8.5vw, 116px);
+  font-weight: 600;
+  letter-spacing: -.03em;
+  line-height: .95;
+  margin-bottom: 28px;
+  font-style: italic;
+}
+.h1-ws {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(126,163,255,.7);
+}
+.h1-slash {
+  display: inline-block;
+  color: var(--border2);
+  font-style: normal;
+  margin: 0 12px;
+  font-weight: 300;
+}
+.h1-cc {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(77,217,168,.7);
+}
+.h1-sub {
+  display: block;
+  font-size: clamp(52px, 7.5vw, 100px);
+  font-weight: 700;
+  font-style: normal;
+  color: var(--text);
+  letter-spacing: -.04em;
+  margin-top: 8px;
+}
 
-.arena-head{display:flex;align-items:center;gap:14px;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--vdim)}
-.arena-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px}
-.ws-icon{background:rgba(124,111,224,.15)}
-.cc-icon{background:rgba(255,107,53,.15)}
-.arena-title{font-size:22px;font-weight:700}
-.arena-ws .arena-title{color:var(--ws2)}
-.arena-cc .arena-title{color:var(--cc2)}
+.hero-desc {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto 48px;
+  line-height: 1.7;
+  letter-spacing: .01em;
+}
 
-.feat-list{list-style:none;display:flex;flex-direction:column;gap:18px}
-.feat-item{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:rgba(255,255,255,.65);line-height:1.55}
-.feat-pip{width:5px;height:5px;border-radius:50%;margin-top:7px;flex-shrink:0}
-.ws-pip{background:var(--ws);box-shadow:0 0 6px var(--ws)}
-.cc-pip{background:var(--cc);box-shadow:0 0 6px var(--cc)}
-.feat-item strong{color:rgba(255,255,255,.9);font-weight:600}
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 13px 28px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all .25s;
+  font-family: var(--font-body);
+}
+.btn-ws {
+  background: var(--ws);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(59,109,255,.3);
+}
+.btn-ws:hover { background: #5584ff; box-shadow: 0 8px 36px rgba(59,109,255,.45); transform: translateY(-2px) }
+.btn-cc {
+  background: var(--cc);
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(0,176,122,.3);
+}
+.btn-cc:hover { background: #00c98a; box-shadow: 0 8px 36px rgba(0,176,122,.45); transform: translateY(-2px) }
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { background: rgba(255,255,255,.04); color: var(--text); transform: translateY(-1px) }
 
-/* METRICS ROW */
-.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);border-radius:24px;overflow:hidden;border:1px solid var(--vdim)}
-.metric-cell{padding:40px 28px;background:var(--s1);border-right:1px solid var(--vdim);text-align:center;transition:background .3s}
-.metric-cell:last-child{border-right:none}
-.metric-cell:hover{background:var(--s2)}
-.metric-num{font-size:52px;font-weight:700;letter-spacing:-.04em;line-height:1;margin-bottom:6px;font-family:'Space Grotesk',sans-serif}
-.metric-label{font-size:12px;color:var(--dim);font-weight:400}
-.metric-source{font-family:'Space Mono',monospace;font-size:10px;color:var(--vdim);margin-top:6px}
-.ws-num{background:linear-gradient(135deg,var(--ws),var(--ws2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.cc-num{background:linear-gradient(135deg,var(--cc),var(--cc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* scroll arrow */
+.scroll-arrow {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: .3;
+  animation: arrowBob 2.5s ease-in-out infinite;
+}
+.scroll-arrow span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@keyframes arrowBob {
+  0%,100% { transform: translateX(-50%) translateY(0) }
+  50% { transform: translateX(-50%) translateY(8px) }
+}
 
-/* TERMINAL */
-.term-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.term-win{background:#07070f;border-radius:18px;overflow:hidden;border:1px solid var(--vdim);transition:box-shadow .3s}
-.term-win:hover{box-shadow:0 0 0 1px rgba(255,255,255,.08)}
-.term-titlebar{display:flex;align-items:center;gap:0;padding:14px 20px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--vdim)}
-.dots{display:flex;gap:6px;margin-right:14px}
-.dot{width:11px;height:11px;border-radius:50%}
-.dot-r{background:#ff5f57}.dot-y{background:#ffbd2e}.dot-g{background:#28ca41}
-.term-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--dim)}
-.term-body{padding:24px;font-family:'Space Mono',monospace;font-size:13px;line-height:1.9;min-height:280px}
-.t-dim{color:var(--dim)}
-.t-ws{color:var(--ws2)}
-.t-cc{color:var(--cc2)}
-.t-green{color:#4ade80}
-.t-white{color:#fff}
-.t-cmd{color:rgba(255,255,255,.9)}
-.caret{display:inline-block;width:8px;height:14px;background:#fff;vertical-align:middle;animation:blink 1.1s steps(1) infinite}
-.caret-ws{background:var(--ws2)}
-.caret-cc{background:var(--cc2)}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+/* ─────────────────────────────────────────────
+   TICKER
+───────────────────────────────────────────── */
+.ticker {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 14px 0;
+}
+.ticker-row {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  animation: tickerMove 35s linear infinite;
+}
+.tick-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 32px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.tick-item .accent { color: var(--muted) }
+.tick-sep { color: rgba(255,255,255,.08); padding: 0 4px }
+@keyframes tickerMove {
+  from { transform: translateX(0) }
+  to   { transform: translateX(-50%) }
+}
 
-/* RADAR / SCORE */
-.radar-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.radar-card{background:var(--s1);border-radius:24px;padding:40px;border:1px solid var(--vdim);position:relative;overflow:hidden}
-.radar-card::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;filter:blur(80px);opacity:.08}
-.rws::after{background:var(--ws)}
-.rcc::after{background:var(--cc)}
-.radar-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
-.radar-name{font-size:26px;font-weight:700;margin-bottom:4px}
-.radar-tag{font-size:12px;color:var(--dim)}
-.radar-score{font-size:48px;font-weight:700;letter-spacing:-.04em;font-family:'Space Grotesk',sans-serif}
-.rws .radar-score{color:var(--ws2)}
-.rcc .radar-score{color:var(--cc2)}
+/* ─────────────────────────────────────────────
+   LAYOUT HELPERS
+───────────────────────────────────────────── */
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 56px;
+}
+.section { padding: 100px 0 }
+.section-lg { padding: 120px 0 }
 
-.bar-list{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
-.bar-item{}
-.bar-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;color:var(--dim)}
-.bar-val{font-family:'Space Mono',monospace;font-size:11px}
-.bar-track{height:5px;background:rgba(255,255,255,.05);border-radius:100px;overflow:hidden}
-.bar-fill{height:100%;border-radius:100px;transition:width 1.8s cubic-bezier(.16,1,.3,1)}
-.ws-bar{background:linear-gradient(90deg,var(--ws),var(--ws2))}
-.cc-bar{background:linear-gradient(90deg,var(--cc),var(--cc2))}
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--faint);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.label::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--faint);
+}
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 5vw, 62px);
+  font-weight: 600;
+  letter-spacing: -.03em;
+  line-height: 1.05;
+  margin-bottom: 14px;
+  font-style: italic;
+}
+.h2 em { font-style: normal; color: var(--muted) }
+.sub {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 500px;
+  line-height: 1.7;
+  margin-bottom: 60px;
+  letter-spacing: .01em;
+}
 
-.radar-verdict{font-size:13px;color:var(--dim);line-height:1.65;padding-top:20px;border-top:1px solid var(--vdim)}
+/* divider */
+.hr {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
 
-/* PHILOSOPHY CARDS */
-.phil-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.phil-card{background:var(--s1);border-radius:20px;padding:36px;border:1px solid var(--vdim);transition:all .3s}
-.phil-card:hover{background:var(--s2);transform:translateY(-4px)}
-.phil-head{display:flex;align-items:center;gap:14px;margin-bottom:28px}
-.phil-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px}
-.ws-bg{background:rgba(124,111,224,.12)}
-.cc-bg{background:rgba(255,107,53,.12)}
-.phil-title{font-size:20px;font-weight:700}
-.phil-sub{font-size:12px;color:var(--dim);margin-top:2px}
+/* ─────────────────────────────────────────────
+   METRICS STRIP
+───────────────────────────────────────────── */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg2);
+}
+.metric {
+  padding: 44px 32px;
+  border-right: 1px solid var(--border);
+  transition: background .25s;
+}
+.metric:last-child { border-right: none }
+.metric:hover { background: var(--bg3) }
+.m-num {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.m-ws { color: var(--ws-light) }
+.m-cc { color: var(--cc-light) }
+.m-label {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+.m-src {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  color: var(--faint);
+}
 
-.step-list{display:flex;flex-direction:column;gap:16px}
-.step{display:flex;gap:14px;align-items:flex-start}
-.step-num{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.ws-sn{background:rgba(124,111,224,.18);color:var(--ws2)}
-.cc-sn{background:rgba(255,107,53,.18);color:var(--cc2)}
-.step-body{font-size:14px;color:rgba(255,255,255,.6);line-height:1.5}
-.step-body b{color:rgba(255,255,255,.9);display:block;margin-bottom:2px;font-weight:600}
+/* ─────────────────────────────────────────────
+   FEATURE TABLE (proper comparison table)
+───────────────────────────────────────────── */
+.compare-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg2);
+}
+.compare-table thead tr th {
+  padding: 20px 28px;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+.th-feature { color: var(--faint); width: 30% }
+.th-ws {
+  color: var(--ws-light);
+  background: rgba(59,109,255,.04);
+  border-left: 1px solid rgba(59,109,255,.15);
+}
+.th-cc {
+  color: var(--cc-light);
+  background: rgba(0,176,122,.04);
+  border-left: 1px solid rgba(0,176,122,.15);
+}
+.th-ws, .th-cc { text-align: center; width: 35% }
 
-/* PRICING */
-.price-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.price-card{background:var(--s1);border-radius:22px;padding:40px;border:1px solid var(--vdim)}
-.price-header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
-.price-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.price-name{font-size:22px;font-weight:700}
-.ws-pname{color:var(--ws2)}
-.cc-pname{color:var(--cc2)}
-.price-big{font-size:56px;font-weight:700;letter-spacing:-.04em;margin:20px 0 4px}
-.price-period{font-size:13px;color:var(--dim);margin-bottom:28px}
-.price-feats{list-style:none;display:flex;flex-direction:column;gap:13px}
-.pf{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.65)}
-.pf-y{color:#4ade80;font-size:15px;margin-top:1px}
-.pf-n{color:var(--vdim);font-size:15px;margin-top:1px}
+.compare-table tbody tr { transition: background .2s }
+.compare-table tbody tr:hover { background: rgba(255,255,255,.02) }
+.compare-table tbody td {
+  padding: 18px 28px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.compare-table tbody tr:last-child td { border-bottom: none }
+.td-feature {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: .01em;
+}
+.td-ws {
+  color: rgba(240,240,240,.75);
+  border-left: 1px solid rgba(59,109,255,.1);
+  background: rgba(59,109,255,.02);
+  text-align: center;
+  font-size: 13px;
+}
+.td-cc {
+  color: rgba(240,240,240,.75);
+  border-left: 1px solid rgba(0,176,122,.1);
+  background: rgba(0,176,122,.02);
+  text-align: center;
+  font-size: 13px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .04em;
+}
+.badge-y { background: rgba(74,222,128,.1); color: #4ade80 }
+.badge-n { background: rgba(255,255,255,.04); color: var(--faint) }
+.badge-p { background: rgba(59,109,255,.12); color: var(--ws-light) }
+.badge-g { background: rgba(0,176,122,.12); color: var(--cc-light) }
 
-/* VERDICT */
-.verdict-wrap{padding:100px 48px;text-align:center;max-width:1000px;margin:0 auto}
-.verdict-title{font-size:clamp(40px,6vw,80px);font-weight:700;letter-spacing:-.05em;line-height:1;margin-bottom:20px}
-.verdict-desc{font-size:17px;color:var(--dim);max-width:520px;margin:0 auto 60px;line-height:1.65}
-.verdict-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:left}
-.vcard{background:var(--s1);border-radius:20px;padding:32px;border:1px solid var(--vdim)}
-.vcard-label{font-size:10px;font-family:'Space Mono',monospace;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}
-.ws-vl{color:var(--ws2)}
-.cc-vl{color:var(--cc2)}
-.vcard-title{font-size:22px;font-weight:700;margin-bottom:10px}
-.vcard-desc{font-size:14px;color:var(--dim);line-height:1.6;margin-bottom:16px}
-.tags{display:flex;flex-wrap:wrap;gap:7px}
-.tag{font-size:11px;padding:5px 12px;border-radius:100px;font-weight:500}
-.wst{background:rgba(124,111,224,.14);color:var(--ws2)}
-.cct{background:rgba(255,107,53,.14);color:var(--cc2)}
+/* ─────────────────────────────────────────────
+   SPLIT PHILOSOPHY
+───────────────────────────────────────────── */
+.split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.split-panel {
+  padding: 52px 48px;
+  position: relative;
+  overflow: hidden;
+  transition: background .3s;
+}
+.split-ws { background: var(--bg2) }
+.split-cc { background: var(--bg2) }
+.split-ws:hover { background: var(--bg3) }
+.split-cc:hover { background: var(--bg3) }
 
-/* FOOTER */
-footer{padding:40px 48px;border-top:1px solid var(--vdim);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--vdim)}
+/* accent corner glow */
+.split-ws::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--ws-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
+.split-cc::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cc-glow) 0%, transparent 70%);
+  pointer-events: none;
+}
 
-/* ANIMATIONS */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .75s ease,transform .75s ease}
-.reveal.in{opacity:1;transform:none}
-.reveal-l{opacity:0;transform:translateX(-28px);transition:opacity .75s ease,transform .75s ease}
-.reveal-l.in{opacity:1;transform:none}
-.reveal-r{opacity:0;transform:translateX(28px);transition:opacity .75s ease,transform .75s ease}
-.reveal-r.in{opacity:1;transform:none}
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ws-pi { background: rgba(59,109,255,.1); border: 1px solid rgba(59,109,255,.2) }
+.cc-pi { background: rgba(0,176,122,.1); border: 1px solid rgba(0,176,122,.2) }
+.panel-meta {}
+.panel-title {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.ws-pt { color: var(--ws-light) }
+.cc-pt { color: var(--cc-light) }
+.panel-sub { font-size: 12px; color: var(--faint); letter-spacing: .04em }
 
-/* MOBILE */
-@media(max-width:768px){
-  nav{padding:14px 20px}
-  .section{padding:60px 20px}
-  .arena{grid-template-columns:1fr}
-  .arena-divider{display:none}
-  .arena-ws{border-right:none;border-bottom:1px solid var(--vdim)}
-  .term-grid,.radar-grid,.phil-grid,.price-wrap,.verdict-grid,.metrics-grid{grid-template-columns:1fr}
-  .hero{padding:90px 24px 60px}
+.step-list { display: flex; flex-direction: column; gap: 0 }
+.step-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.step-item:last-child { border-bottom: none }
+.s-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--faint);
+  width: 20px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.s-body {}
+.s-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+  letter-spacing: .01em;
+}
+.s-desc {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────
+   TERMINALS
+───────────────────────────────────────────── */
+.term-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.terminal {
+  background: #07070c;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: border-color .3s;
+}
+.terminal:hover { border-color: var(--border2) }
+.t-topbar {
+  display: flex;
+  align-items: center;
+  padding: 13px 20px;
+  background: rgba(255,255,255,.025);
+  border-bottom: 1px solid var(--border);
+  gap: 14px;
+}
+.t-dots { display: flex; gap: 6px }
+.tdot { width: 11px; height: 11px; border-radius: 50% }
+.t-r { background: #ff5f57 } .t-y { background: #febc2e } .t-g { background: #28c840 }
+.t-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--faint);
+  flex: 1;
+  text-align: center;
+}
+.t-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .06em;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.t-badge-ws { background: var(--ws-dim); color: var(--ws-light); border: 1px solid rgba(59,109,255,.2) }
+.t-badge-cc { background: var(--cc-dim); color: var(--cc-light); border: 1px solid rgba(0,176,122,.2) }
+
+.t-body {
+  padding: 28px 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.9;
+  min-height: 300px;
+}
+.tl { display: block }
+.t-prompt { color: var(--faint) }
+.t-cmd { color: var(--text) }
+.t-comment { color: var(--faint); font-style: italic }
+.t-ws-c { color: var(--ws-light) }
+.t-cc-c { color: var(--cc-light) }
+.t-ok { color: #4ade80 }
+.t-dim { color: rgba(255,255,255,.3) }
+.caret {
+  display: inline-block;
+  width: 7px; height: 13px;
+  background: currentColor;
+  vertical-align: middle;
+  animation: blink 1.1s steps(1) infinite;
+}
+.ws-caret { color: var(--ws-light) }
+.cc-caret { color: var(--cc-light) }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ─────────────────────────────────────────────
+   SCORES
+───────────────────────────────────────────── */
+.score-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.score-card {
+  background: var(--bg2);
+  border-radius: var(--radius-xl);
+  padding: 44px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.score-ws::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,109,255,.06) 0%, transparent 70%);
+}
+.score-cc::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,176,122,.06) 0%, transparent 70%);
+}
+.score-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 36px;
+}
+.score-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 4px;
+}
+.ws-sn { color: var(--ws-light) }
+.cc-sn { color: var(--cc-light) }
+.score-maker { font-size: 12px; color: var(--faint); letter-spacing: .04em }
+.score-big {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.ws-sb { color: var(--ws-light) }
+.cc-sb { color: var(--cc-light) }
+.score-den { font-size: 22px; color: var(--faint); font-weight: 400 }
+
+.bar-rows { display: flex; flex-direction: column; gap: 18px; margin-bottom: 30px }
+.bar-row {}
+.bar-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.bar-name { color: var(--muted); font-weight: 400 }
+.bar-pct { font-family: var(--font-mono); font-size: 11px; color: var(--faint) }
+.bar-track {
+  height: 4px;
+  background: rgba(255,255,255,.05);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 1.8s cubic-bezier(.16,1,.3,1);
+}
+.ws-bf { background: linear-gradient(90deg, var(--ws), var(--ws-light)) }
+.cc-bf { background: linear-gradient(90deg, var(--cc), var(--cc-light)) }
+
+.score-note {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.7;
+  padding-top: 22px;
+  border-top: 1px solid var(--border);
+  letter-spacing: .01em;
+}
+
+/* ─────────────────────────────────────────────
+   PRICING
+───────────────────────────────────────────── */
+.pricing-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.price-card {
+  background: var(--bg2);
+  border-radius: var(--radius-xl);
+  padding: 44px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: border-color .3s;
+}
+.price-card-ws:hover { border-color: rgba(59,109,255,.3) }
+.price-card-cc:hover { border-color: rgba(0,176,122,.3) }
+
+.price-header { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--border) }
+.price-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center }
+.ws-picon { background: var(--ws-dim); border: 1px solid rgba(59,109,255,.2) }
+.cc-picon { background: var(--cc-dim); border: 1px solid rgba(0,176,122,.2) }
+.price-name { font-size: 20px; font-weight: 600 }
+.ws-pn { color: var(--ws-light) }
+.cc-pn { color: var(--cc-light) }
+.price-plan-tag { font-size: 11px; color: var(--faint); letter-spacing: .04em; margin-top: 2px }
+
+.price-amount {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.ws-pa { color: var(--ws-light) }
+.cc-pa { color: var(--cc-light) }
+.price-period { font-size: 13px; color: var(--faint); margin-bottom: 32px; font-weight: 300 }
+
+.price-items { list-style: none; display: flex; flex-direction: column; gap: 14px; flex: 1 }
+.pi {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(240,240,240,.7);
+  line-height: 1.4;
+  align-items: flex-start;
+}
+.pi-y { color: #4ade80; flex-shrink: 0; margin-top: 1px }
+.pi-n { color: var(--faint); flex-shrink: 0; margin-top: 1px }
+
+/* ─────────────────────────────────────────────
+   VERDICT
+───────────────────────────────────────────── */
+.verdict-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 120px 56px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+.verdict-h {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 600;
+  letter-spacing: -.04em;
+  line-height: 1;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+.verdict-desc {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 540px;
+  margin: 0 auto 64px;
+  line-height: 1.7;
+}
+.verdict-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  text-align: left;
+}
+.vcard {
+  background: var(--bg2);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  border: 1px solid var(--border);
+  transition: all .3s;
+}
+.vcard-ws:hover { border-color: rgba(59,109,255,.25); background: var(--bg3) }
+.vcard-cc:hover { border-color: rgba(0,176,122,.25); background: var(--bg3) }
+
+.vcard-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.vcard-eyebrow::before { content: ''; display: inline-block; width: 16px; height: 1px; background: currentColor; opacity: .6 }
+.ws-ve { color: var(--ws-light) }
+.cc-ve { color: var(--cc-light) }
+.vcard-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 14px;
+}
+.vcard-desc { font-size: 14px; font-weight: 300; color: var(--muted); line-height: 1.65; margin-bottom: 20px }
+.vtags { display: flex; flex-wrap: wrap; gap: 8px }
+.vtag {
+  font-size: 11px;
+  font-weight: 400;
+  padding: 5px 12px;
+  border-radius: 100px;
+  letter-spacing: .03em;
+  border: 1px solid;
+}
+.ws-vt { border-color: rgba(59,109,255,.3); color: var(--ws-light); background: var(--ws-dim) }
+.cc-vt { border-color: rgba(0,176,122,.3); color: var(--cc-light); background: var(--cc-dim) }
+
+/* ─────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────── */
+footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 36px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--faint);
+  letter-spacing: .02em;
+}
+footer span { color: var(--muted) }
+
+/* ─────────────────────────────────────────────
+   REVEAL ANIMATIONS
+───────────────────────────────────────────── */
+.r {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.r.on { opacity: 1; transform: none }
+.r-l {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.r-l.on { opacity: 1; transform: none }
+.r-r {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.r-r.on { opacity: 1; transform: none }
+.r-d2 { transition-delay: .1s }
+.r-d3 { transition-delay: .2s }
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 0 20px }
+  .container { padding: 0 24px }
+  .split-grid, .term-grid, .score-grid, .pricing-row, .verdict-cards { grid-template-columns: 1fr }
+  .metrics { grid-template-columns: 1fr 1fr }
+  .metric { border-bottom: 1px solid var(--border) }
+  .compare-table thead th:first-child { display: none }
+  .compare-table tbody td:first-child { display: none }
+  .th-ws, .th-cc { width: 50% }
+  footer { flex-direction: column; gap: 8px; text-align: center; padding: 24px }
+  .hero-h1 { font-size: clamp(44px,10vw,80px) }
+  .nav-links { display: none }
 }
 </style>
 </head>
 <body>
 
-<div id="cursor"></div>
-<div id="cursor-ring"></div>
+<div id="cur"></div>
+<div id="cur-o"></div>
 
-<!-- NAV -->
+<!-- ═══════════════ NAV ═══════════════ -->
 <nav>
-  <div class="nav-title">// ai-coding-battle</div>
-  <div class="nav-pill">
-    <div class="nav-dot ws-ndot"></div>
-    Windsurf
-    <span style="color:var(--vdim);margin:0 4px">·</span>
-    <div class="nav-dot cc-ndot"></div>
-    Claude Code
+  <div class="nav-wordmark">AI Tools <span>/ 2025</span></div>
+  <ul class="nav-links">
+    <li><a href="#compare">Compare</a></li>
+    <li><a href="#workflow">Workflow</a></li>
+    <li><a href="#scores">Scores</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#verdict">Verdict</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#" class="pill pill-ws">Windsurf ↗</a>
+    <a href="#" class="pill pill-cc">Claude Code ↗</a>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- ═══════════════ HERO ═══════════════ -->
 <div class="hero">
-  <canvas id="hero-canvas"></canvas>
+  <div class="hero-bg"></div>
+  <div class="hero-diag">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- subtle geometric lines -->
+      <line x1="0" y1="450" x2="1440" y2="450" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <line x1="720" y1="0" x2="720" y2="900" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+      <!-- diagonal accent -->
+      <line x1="200" y1="0" x2="900" y2="900" stroke="rgba(59,109,255,.06)" stroke-width="1.5"/>
+      <line x1="540" y1="0" x2="1240" y2="900" stroke="rgba(0,176,122,.04)" stroke-width="1"/>
+      <!-- corner marks -->
+      <path d="M60 60 L60 40 L80 40" stroke="rgba(255,255,255,.15)" stroke-width="1" fill="none"/>
+      <path d="M1380 60 L1380 40 L1360 40" stroke="rgba(255,255,255,.15)" stroke-width="1" fill="none"/>
+      <path d="M60 840 L60 860 L80 860" stroke="rgba(255,255,255,.15)" stroke-width="1" fill="none"/>
+      <path d="M1380 840 L1380 860 L1360 860" stroke="rgba(255,255,255,.15)" stroke-width="1" fill="none"/>
+      <!-- circles -->
+      <circle cx="200" cy="650" r="120" stroke="rgba(59,109,255,.05)" stroke-width="1" fill="none"/>
+      <circle cx="200" cy="650" r="80" stroke="rgba(59,109,255,.04)" stroke-width="1" fill="none"/>
+      <circle cx="1240" cy="280" r="100" stroke="rgba(0,176,122,.05)" stroke-width="1" fill="none"/>
+      <circle cx="1240" cy="280" r="60" stroke="rgba(0,176,122,.04)" stroke-width="1" fill="none"/>
+    </svg>
+  </div>
+  <div class="scanline"></div>
+
   <div class="hero-inner">
-    <div class="year-badge">
-      <span class="badge-spark">⚡</span>
-      2025 Edition · The Definitive Showdown
+    <div class="eyebrow">
+      <div class="eyebrow-line"></div>
+      Professional Analysis · 2025 Edition
+      <div class="eyebrow-line"></div>
     </div>
 
     <div class="hero-logos">
-      <div class="logo-block">
-        <div class="logo-orb ws-orb">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <path d="M20 4L36 13V27L20 36L4 27V13L20 4Z" fill="rgba(255,255,255,.95)"/>
-            <path d="M20 10L30 16V24L20 30L10 24V16L20 10Z" fill="#7c6fe0"/>
-            <circle cx="20" cy="20" r="4" fill="rgba(255,255,255,.8)"/>
+      <div class="brand-block">
+        <div class="brand-mark ws-mark">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <path d="M19 4L34 12.5V25.5L19 34L4 25.5V12.5L19 4Z" fill="rgba(59,109,255,.15)" stroke="rgba(126,163,255,.5)" stroke-width="1"/>
+            <path d="M19 10L28 15V23L19 28L10 23V15L19 10Z" fill="rgba(59,109,255,.3)" stroke="rgba(126,163,255,.3)" stroke-width=".5"/>
+            <circle cx="19" cy="19" r="3.5" fill="rgba(126,163,255,.8)"/>
           </svg>
         </div>
-        <div class="logo-name ws-name">Windsurf</div>
+        <div class="brand-name ws-name">Windsurf</div>
       </div>
 
-      <div class="vs-center">
-        <div class="vs-text">vs</div>
-        <div class="vs-line"></div>
-        <div class="vs-text">vs</div>
+      <div class="vs-glyph">
+        <div class="vs-rule"></div>
+        <div class="vs-label">vs</div>
+        <div class="vs-rule"></div>
       </div>
 
-      <div class="logo-block">
-        <div class="logo-orb cc-orb">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <circle cx="20" cy="20" r="16" fill="rgba(255,255,255,.95)"/>
-            <path d="M20 12C15.6 12 12 15.6 12 20C12 24.4 15.6 28 20 28C22.4 28 24.6 27 26.2 25.4L23.6 22.8C22.6 23.8 21.4 24.4 20 24.4C17.6 24.4 15.6 22.4 15.6 20C15.6 17.6 17.6 15.6 20 15.6C21.4 15.6 22.6 16.2 23.6 17.2L26.2 14.6C24.6 13 22.4 12 20 12Z" fill="#ff6b35"/>
+      <div class="brand-block">
+        <div class="brand-mark cc-mark">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <circle cx="19" cy="19" r="15" fill="rgba(0,176,122,.1)" stroke="rgba(77,217,168,.4)" stroke-width="1"/>
+            <path d="M19 11C14.6 11 11 14.6 11 19C11 23.4 14.6 27 19 27C21.4 27 23.6 26 25.2 24.4L22.8 22C21.8 23 20.5 23.6 19 23.6C16.6 23.6 14.4 21.6 14.4 19C14.4 16.4 16.6 14.4 19 14.4C20.5 14.4 21.8 15 22.8 16L25.2 13.6C23.6 12 21.4 11 19 11Z" fill="rgba(77,217,168,.8)"/>
           </svg>
         </div>
-        <div class="logo-name cc-name">Claude Code</div>
+        <div class="brand-name cc-name">Claude Code</div>
       </div>
     </div>
 
     <h1 class="hero-h1">
-      <span class="split-line split-ws">Windsurf</span>
-      <span class="split-line" style="color:rgba(255,255,255,.15);font-size:clamp(28px,4vw,52px);letter-spacing:0">versus</span>
-      <span class="split-line split-cc">Claude Code</span>
+      <span class="h1-ws">Windsurf</span><span class="h1-slash">/</span><span class="h1-cc">Claude Code</span>
+      <span class="h1-sub">Which one wins?</span>
     </h1>
 
     <p class="hero-desc">
-      Two AI coding tools. Two philosophies. One question — which one should you be using in 2025?
+      A rigorous, unbiased comparison of the two most consequential AI coding tools of 2025. We examined every dimension — from daily workflow to total cost of ownership.
     </p>
 
-    <div class="cta-row">
-      <a href="#compare" class="cta-btn cta-ws">🌊 See Windsurf</a>
-      <a href="#compare" class="cta-btn cta-cc">⚡ See Claude Code</a>
-      <a href="#verdict" class="cta-btn cta-ghost">Jump to Verdict →</a>
+    <div class="hero-actions">
+      <a href="#compare" class="btn btn-ws">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 5.5V10.5L8 14L2 10.5V5.5L8 2Z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+        See Windsurf
+      </a>
+      <a href="#compare" class="btn btn-cc">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 5C6.3 5 5 6.3 5 8C5 9.7 6.3 11 8 11C8.9 11 9.7 10.6 10.2 10L9.1 8.9C8.8 9.3 8.4 9.5 8 9.5C7.2 9.5 6.5 8.8 6.5 8C6.5 7.2 7.2 6.5 8 6.5C8.4 6.5 8.8 6.7 9.1 7.1L10.2 6C9.7 5.4 8.9 5 8 5Z" fill="currentColor"/></svg>
+        See Claude Code
+      </a>
+      <a href="#verdict" class="btn btn-ghost">Jump to verdict →</a>
     </div>
   </div>
 
-  <div class="scroll-ind">
-    <div class="scroll-line"></div>
-    <div class="scroll-text">scroll</div>
+  <div class="scroll-arrow">
+    <svg width="16" height="24" viewBox="0 0 16 24" fill="none">
+      <line x1="8" y1="2" x2="8" y2="18" stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+      <path d="M3 14L8 19L13 14" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none"/>
+    </svg>
+    <span>Scroll</span>
   </div>
 </div>
 
-<!-- TICKER -->
+<!-- ═══════════════ TICKER ═══════════════ -->
 <div class="ticker">
-  <div class="ticker-inner" id="ticker-inner">
-    <span class="ticker-item">🌊 <span class="hl">Windsurf</span> — AI-Native IDE</span>
-    <span class="ticker-item">⚡ <span class="hl">Claude Code</span> — Agentic CLI</span>
-    <span class="ticker-item">🧠 Cascade Multi-file Reasoning</span>
-    <span class="ticker-item">🔁 Autonomous Git Workflows</span>
-    <span class="ticker-item">🎯 Inline Ghost Text</span>
-    <span class="ticker-item">🤖 MCP Server Support</span>
-    <span class="ticker-item">🆓 Free Tier Available</span>
-    <span class="ticker-item">⌨️ Works in Any Terminal</span>
-    <span class="ticker-item">📦 VS Code Extension Compat</span>
-    <span class="ticker-item">🔗 GitHub + PR Automation</span>
-    <span class="ticker-item">🌊 <span class="hl">Windsurf</span> — AI-Native IDE</span>
-    <span class="ticker-item">⚡ <span class="hl">Claude Code</span> — Agentic CLI</span>
-    <span class="ticker-item">🧠 Cascade Multi-file Reasoning</span>
-    <span class="ticker-item">🔁 Autonomous Git Workflows</span>
-    <span class="ticker-item">🎯 Inline Ghost Text</span>
-    <span class="ticker-item">🤖 MCP Server Support</span>
-    <span class="ticker-item">🆓 Free Tier Available</span>
-    <span class="ticker-item">⌨️ Works in Any Terminal</span>
-    <span class="ticker-item">📦 VS Code Extension Compat</span>
-    <span class="ticker-item">🔗 GitHub + PR Automation</span>
+  <div class="ticker-row">
+    <span class="tick-item"><span class="accent">Windsurf</span><span class="tick-sep">—</span>AI-Native IDE</span>
+    <span class="tick-item"><span class="accent">Claude Code</span><span class="tick-sep">—</span>Agentic CLI</span>
+    <span class="tick-item">Cascade Multi-file Reasoning</span>
+    <span class="tick-item">Autonomous Git Workflow</span>
+    <span class="tick-item">Real-time Ghost Text</span>
+    <span class="tick-item">MCP Server Ecosystem</span>
+    <span class="tick-item">800 Free Credits / Month</span>
+    <span class="tick-item">Works in Any Terminal</span>
+    <span class="tick-item">Full VS Code Compatibility</span>
+    <span class="tick-item">Automated PR Creation</span>
+    <span class="tick-item">CLAUDE.md Project Memory</span>
+    <span class="tick-item">Multi-Model Support</span>
+    <span class="tick-item"><span class="accent">Windsurf</span><span class="tick-sep">—</span>AI-Native IDE</span>
+    <span class="tick-item"><span class="accent">Claude Code</span><span class="tick-sep">—</span>Agentic CLI</span>
+    <span class="tick-item">Cascade Multi-file Reasoning</span>
+    <span class="tick-item">Autonomous Git Workflow</span>
+    <span class="tick-item">Real-time Ghost Text</span>
+    <span class="tick-item">MCP Server Ecosystem</span>
+    <span class="tick-item">800 Free Credits / Month</span>
+    <span class="tick-item">Works in Any Terminal</span>
+    <span class="tick-item">Full VS Code Compatibility</span>
+    <span class="tick-item">Automated PR Creation</span>
+    <span class="tick-item">CLAUDE.md Project Memory</span>
+    <span class="tick-item">Multi-Model Support</span>
   </div>
 </div>
 
-<!-- METRICS -->
+<!-- ═══════════════ METRICS ═══════════════ -->
 <div class="section">
-  <div class="reveal"><div class="label">At a glance</div>
-  <h2 class="h2">The Numbers</h2></div>
-  <div class="metrics-grid reveal">
-    <div class="metric-cell">
-      <div class="metric-num ws-num" data-count="800">0</div>
-      <div class="metric-label">Free Credits / Month</div>
-      <div class="metric-source">Windsurf Free Tier</div>
-    </div>
-    <div class="metric-cell">
-      <div class="metric-num cc-num" data-count="100">0</div>
-      <div class="metric-label">% Autonomous Task Completion</div>
-      <div class="metric-source">Claude Code w/ full permissions</div>
-    </div>
-    <div class="metric-cell">
-      <div class="metric-num ws-num" data-count="3">0</div>
-      <div class="metric-label">AI Models Available in Windsurf</div>
-      <div class="metric-source">GPT-4o · Claude · Gemini</div>
-    </div>
-    <div class="metric-cell">
-      <div class="metric-num cc-num" data-count="60">0</div>
-      <div class="metric-label">MCP Server Integrations</div>
-      <div class="metric-source">Claude Code ecosystem</div>
+  <div class="container">
+    <div class="r"><div class="label">At a glance</div>
+    <h2 class="h2">The Numbers<em>.</em></h2></div>
+    <div class="metrics r r-d2">
+      <div class="metric">
+        <div class="m-num m-ws" data-count="800">0</div>
+        <div class="m-label">Free Flow Actions per Month</div>
+        <div class="m-src">WINDSURF FREE TIER</div>
+      </div>
+      <div class="metric">
+        <div class="m-num m-cc" data-count="100">0</div>
+        <div class="m-label">% Task Completion Rate (with permissions)</div>
+        <div class="m-src">CLAUDE CODE AGENTIC MODE</div>
+      </div>
+      <div class="metric">
+        <div class="m-num m-ws" data-count="3">0</div>
+        <div class="m-label">AI Models Available (GPT-4o · Claude · Gemini)</div>
+        <div class="m-src">WINDSURF PRO</div>
+      </div>
+      <div class="metric">
+        <div class="m-num m-cc" data-count="60">0</div>
+        <div class="m-label">MCP Server Integrations Available</div>
+        <div class="m-src">CLAUDE CODE ECOSYSTEM</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ARENA -->
+<div class="hr"></div>
+
+<!-- ═══════════════ COMPARISON TABLE ═══════════════ -->
 <div class="section" id="compare">
-  <div class="reveal"><div class="label">Feature comparison</div>
-  <h2 class="h2">Head to Head</h2>
-  <p class="sub">Every major capability — compared honestly, without bias.</p></div>
-  <div class="arena reveal">
-    <div class="arena-col arena-ws">
-      <div class="arena-head">
-        <div class="arena-icon ws-icon">🌊</div>
-        <div class="arena-title">Windsurf</div>
-      </div>
-      <ul class="feat-list">
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Full IDE (VS Code fork)</strong> — AI is native to the editor, not a plugin bolted on after the fact</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Cascade AI agent</strong> — orchestrates multi-file, multi-step changes with full workspace context</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Supercomplete</strong> — fills entire function bodies from intent, not just the next token</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Real-time completions</strong> — ghost text as you type, zero invocation required</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Multi-model</strong> — switch between GPT-4o, Claude 3.7, Gemini 2.0 on any task</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Visual diff review</strong> — accept/reject/modify inline with full diff UI</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>800 free actions/mo</strong> — no credit card, no friction to start</div></li>
-        <li class="feat-item"><div class="feat-pip ws-pip"></div><div><strong>Full VS Code compat</strong> — all extensions, keybindings, settings carry over</div></li>
-      </ul>
-    </div>
+  <div class="container">
+    <div class="r"><div class="label">Feature comparison</div>
+    <h2 class="h2">Side by <em>Side.</em></h2>
+    <p class="sub">Every capability that matters, evaluated honestly across both platforms.</p></div>
 
-    <div class="arena-divider">
-      <div class="vs-pill">VS</div>
-    </div>
-
-    <div class="arena-col arena-cc">
-      <div class="arena-head">
-        <div class="arena-icon cc-icon">⚡</div>
-        <div class="arena-title">Claude Code</div>
-      </div>
-      <ul class="feat-list">
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>Editor agnostic CLI</strong> — works in any terminal with VS Code, JetBrains, Neovim, Zed</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>Full autonomous agency</strong> — reads, writes files, runs tests, commits, opens PRs independently</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>CLAUDE.md memory</strong> — persistent project instructions and conventions remembered across sessions</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>Git-native workflow</strong> — create branches, stage changes, commit with messages, push, open PRs</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>MCP server support</strong> — connect GitHub, Slack, databases, APIs directly into AI context</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>Hooks system</strong> — fire custom scripts on any tool event for full automation pipelines</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>Headless / CI mode</strong> — run fully automated engineering pipelines without any UI</div></li>
-        <li class="feat-item"><div class="feat-pip cc-pip"></div><div><strong>Claude 3.7 Sonnet</strong> — Anthropic's most capable model, optimized for complex reasoning</div></li>
-      </ul>
-    </div>
+    <table class="compare-table r r-d2">
+      <thead>
+        <tr>
+          <th class="th-feature">Capability</th>
+          <th class="th-ws">
+            <span style="display:flex;align-items:center;justify-content:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="currentColor" stroke-width="1" fill="rgba(59,109,255,.2)"/></svg>
+              Windsurf
+            </span>
+          </th>
+          <th class="th-cc">
+            <span style="display:flex;align-items:center;justify-content:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1" fill="rgba(0,176,122,.2)"/></svg>
+              Claude Code
+            </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-feature">Interface Type</td>
+          <td class="td-ws"><span class="badge badge-p">Full IDE (VS Code fork)</span></td>
+          <td class="td-cc"><span class="badge badge-g">Terminal / CLI</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Real-time Completions</td>
+          <td class="td-ws"><span class="badge badge-y">✓ Ghost text inline</span></td>
+          <td class="td-cc"><span class="badge badge-n">✗ Not available</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Multi-file Agent</td>
+          <td class="td-ws"><span class="badge badge-y">✓ Cascade AI</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Native agentic</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Git Workflow Automation</td>
+          <td class="td-ws"><span class="badge badge-n">✗ Manual only</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Branch / commit / PR</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Test Execution</td>
+          <td class="td-ws"><span class="badge badge-n">✗ Suggests only</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Run + fix in loop</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Model Selection</td>
+          <td class="td-ws"><span class="badge badge-y">✓ GPT-4o, Claude, Gemini</span></td>
+          <td class="td-cc"><span class="badge badge-g">Claude 3.7 Sonnet only</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">MCP Server Support</td>
+          <td class="td-ws"><span class="badge badge-n">✗ Not available</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Full ecosystem</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">CI / Headless Mode</td>
+          <td class="td-ws"><span class="badge badge-n">✗ Not available</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Full pipeline support</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Project Memory</td>
+          <td class="td-ws"><span class="badge badge-n">✗ Session only</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ CLAUDE.md persistent</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Editor Compatibility</td>
+          <td class="td-ws"><span class="badge badge-p">Windsurf IDE only</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Any editor / terminal</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">VS Code Extensions</td>
+          <td class="td-ws"><span class="badge badge-y">✓ Full compatibility</span></td>
+          <td class="td-cc"><span class="badge badge-n">✗ N/A (CLI tool)</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Free Tier</td>
+          <td class="td-ws"><span class="badge badge-y">✓ 800 credits/month</span></td>
+          <td class="td-cc"><span class="badge badge-n">✗ Requires Claude Pro</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Hooks / Automation API</td>
+          <td class="td-ws"><span class="badge badge-n">✗ Not available</span></td>
+          <td class="td-cc"><span class="badge badge-y">✓ Full hooks system</span></td>
+        </tr>
+        <tr>
+          <td class="td-feature">Visual Diff Review</td>
+          <td class="td-ws"><span class="badge badge-y">✓ Inline accept/reject</span></td>
+          <td class="td-cc"><span class="badge badge-n">✗ Terminal only</span></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
-<!-- TERMINAL DEMO -->
+<div class="hr"></div>
+
+<!-- ═══════════════ TERMINALS ═══════════════ -->
 <div class="section">
-  <div class="reveal"><div class="label">In action</div>
-  <h2 class="h2">Same Task, Different Tools</h2>
-  <p class="sub">Building a REST endpoint. Watch the different approaches unfold in real time.</p></div>
-  <div class="term-grid reveal">
-    <div class="term-win">
-      <div class="term-titlebar">
-        <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
-        <div class="term-label">windsurf — cascade panel</div>
-      </div>
-      <div class="term-body">
-        <div><span class="t-ws">you</span> <span class="t-dim">→</span> <span class="t-cmd">add /api/posts endpoint with pagination + tests</span></div>
-        <br>
-        <div><span class="t-ws">cascade</span> <span class="t-dim">analyzing workspace...</span></div>
-        <div><span class="t-ws">cascade</span> <span class="t-dim">found Express + Prisma pattern in src/</span></div>
-        <div><span class="t-ws">cascade</span> <span class="t-dim">detected existing route structure</span></div>
-        <br>
-        <div><span class="t-ws">cascade</span> <span class="t-green">+ src/routes/posts.ts</span></div>
-        <div><span class="t-ws">cascade</span> <span class="t-green">~ src/app.ts (register route)</span></div>
-        <div><span class="t-ws">cascade</span> <span class="t-green">+ src/schemas/post.ts</span></div>
-        <br>
-        <div><span class="t-ws">cascade</span> <span class="t-dim">3 files ready for review</span></div>
-        <div><span class="t-dim">───────────────────────────</span></div>
-        <div><span class="t-dim">[Accept All] [Review Diff] [Reject]</span></div>
-        <span class="caret caret-ws"></span>
-      </div>
-    </div>
+  <div class="container">
+    <div class="r"><div class="label">In practice</div>
+    <h2 class="h2">Same Task<em>,</em> Different Approach.</h2>
+    <p class="sub">Objective: build a paginated REST endpoint, write tests, and ship it. Watch each tool's process unfold.</p></div>
 
-    <div class="term-win">
-      <div class="term-titlebar">
-        <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
-        <div class="term-label">claude code — terminal</div>
+    <div class="term-grid r r-d2">
+      <div class="terminal">
+        <div class="t-topbar">
+          <div class="t-dots"><div class="tdot t-r"></div><div class="tdot t-y"></div><div class="tdot t-g"></div></div>
+          <div class="t-path">windsurf — cascade panel</div>
+          <div class="t-badge t-badge-ws">WINDSURF</div>
+        </div>
+        <div class="t-body">
+          <span class="tl"><span class="t-ws-c">you</span>  <span class="t-dim">›</span>  <span class="t-cmd">add GET /api/posts with pagination and error handling</span></span>
+          <span class="tl"></span>
+          <span class="tl"><span class="t-ws-c">cascade</span>  <span class="t-dim">analyzing workspace context…</span></span>
+          <span class="tl"><span class="t-ws-c">cascade</span>  <span class="t-dim">detected: Express + Prisma in src/</span></span>
+          <span class="tl"><span class="t-ws-c">cascade</span>  <span class="t-dim">found existing route pattern in src/routes/</span></span>
+          <span class="tl"></span>
+          <span class="tl"><span class="t-ws-c">cascade</span>  <span class="t-ok">writing src/routes/posts.ts</span></span>
+          <span class="tl"><span class="t-ws-c">cascade</span>  <span class="t-ok">writing src/schemas/post.schema.ts</span></span>
+          <span class="tl"><span class="t-ws-c">cascade</span>  <span class="t-ok">updating src/app.ts</span></span>
+          <span class="tl"></span>
+          <span class="tl"><span class="t-dim">3 files staged for review</span></span>
+          <span class="tl"><span class="t-dim">─────────────────────────────────</span></span>
+          <span class="tl"><span class="t-dim">[ Accept All ]  [ Review Diff ]  [ Discard ]</span></span>
+          <span class="tl"></span>
+          <span class="tl"><span class="t-comment t-ws-c">// awaiting your approval</span>  <span class="caret ws-caret"></span></span>
+        </div>
       </div>
-      <div class="term-body">
-        <div><span class="t-dim">$ </span><span class="t-cmd">claude</span></div>
-        <div><span class="t-cc">you</span> <span class="t-dim">→</span> <span class="t-cmd">add /api/posts with pagination, write tests, commit</span></div>
-        <br>
-        <div><span class="t-cc">claude</span> <span class="t-dim">reading project structure...</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-green">✓ created src/routes/posts.ts</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-green">✓ created src/schemas/post.ts</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-green">✓ created tests/posts.test.ts</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-dim">running: npm test...</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-green">✓ 8 tests passed (0 failed)</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-green">✓ committed: "feat: GET /api/posts with pagination"</span></div>
-        <div><span class="t-cc">claude</span> <span class="t-green">✓ PR opened → github.com/.../pull/38</span></div>
-        <span class="caret caret-cc"></span>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- PHILOSOPHY -->
-<div class="section">
-  <div class="reveal"><div class="label">Design philosophy</div>
-  <h2 class="h2">Two Visions for AI</h2>
-  <p class="sub">These tools weren't built to be the same. They represent fundamentally different bets on the future of coding.</p></div>
-  <div class="phil-grid reveal">
-    <div class="phil-card">
-      <div class="phil-head">
-        <div class="phil-icon ws-bg">🌊</div>
-        <div>
-          <div class="phil-title" style="color:var(--ws2)">Windsurf</div>
-          <div class="phil-sub">IDE-first · visual · ambient</div>
+      <div class="terminal">
+        <div class="t-topbar">
+          <div class="t-dots"><div class="tdot t-r"></div><div class="tdot t-y"></div><div class="tdot t-g"></div></div>
+          <div class="t-path">bash — zsh</div>
+          <div class="t-badge t-badge-cc">CLAUDE CODE</div>
         </div>
-      </div>
-      <div class="step-list">
-        <div class="step">
-          <div class="step-num ws-sn">1</div>
-          <div class="step-body"><b>Open & start coding immediately</b>The IDE loads full workspace context. AI is ambient — no mode switching.</div>
-        </div>
-        <div class="step">
-          <div class="step-num ws-sn">2</div>
-          <div class="step-body"><b>Ghost text follows your cursor</b>Supercomplete fills lines, functions, whole blocks as you type naturally.</div>
-        </div>
-        <div class="step">
-          <div class="step-num ws-sn">3</div>
-          <div class="step-body"><b>Invoke Cascade for complex tasks</b>AI orchestrates multi-file changes with full codebase understanding.</div>
-        </div>
-        <div class="step">
-          <div class="step-num ws-sn">4</div>
-          <div class="step-body"><b>Review changes visually</b>Accept, reject, or modify in the diff panel. You stay in the driver's seat.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="phil-card">
-      <div class="phil-head">
-        <div class="phil-icon cc-bg">⚡</div>
-        <div>
-          <div class="phil-title" style="color:var(--cc2)">Claude Code</div>
-          <div class="phil-sub">terminal-first · autonomous · complete</div>
-        </div>
-      </div>
-      <div class="step-list">
-        <div class="step">
-          <div class="step-num cc-sn">1</div>
-          <div class="step-body"><b>Describe your goal in plain English</b>No breaking tasks into steps. State intent — Claude handles the rest.</div>
-        </div>
-        <div class="step">
-          <div class="step-num cc-sn">2</div>
-          <div class="step-body"><b>Claude reads everything relevant</b>Scans codebase, git history, tests, docs to build complete understanding.</div>
-        </div>
-        <div class="step">
-          <div class="step-num cc-sn">3</div>
-          <div class="step-body"><b>Fully autonomous execution loop</b>Writes code → runs tests → fixes failures → iterates until done.</div>
-        </div>
-        <div class="step">
-          <div class="step-num cc-sn">4</div>
-          <div class="step-body"><b>Ships without you</b>Commits with good messages, opens PRs, handles the full pipeline end-to-end.</div>
+        <div class="t-body">
+          <span class="tl"><span class="t-prompt">~ $</span>  <span class="t-cmd">claude</span></span>
+          <span class="tl"><span class="t-cc-c">you</span>  <span class="t-dim">›</span>  <span class="t-cmd">add GET /api/posts with pagination, write tests, commit</span></span>
+          <span class="tl"></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-dim">reading project structure…</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-ok">✓  created src/routes/posts.ts</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-ok">✓  created src/schemas/post.schema.ts</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-ok">✓  created tests/routes/posts.test.ts</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-dim">running: npm test…</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-ok">✓  all 9 tests passed (0 failed)</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-ok">✓  committed: "feat: GET /api/posts pagination"</span></span>
+          <span class="tl"><span class="t-cc-c">claude</span>  <span class="t-ok">✓  PR #41 opened → github.com/…/pull/41</span></span>
+          <span class="tl"></span>
+          <span class="tl"><span class="t-comment t-cc-c">// task complete — no input required</span>  <span class="caret cc-caret"></span></span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- SCORES -->
-<div class="section">
-  <div class="reveal"><div class="label">Performance breakdown</div>
-  <h2 class="h2">Category Scores</h2></div>
-  <div class="radar-grid reveal">
-    <div class="radar-card rws">
-      <div class="radar-head">
-        <div>
-          <div class="radar-name" style="color:var(--ws2)">Windsurf</div>
-          <div class="radar-tag">by Codeium · AI-Native IDE</div>
+<div class="hr"></div>
+
+<!-- ═══════════════ PHILOSOPHY ═══════════════ -->
+<div class="section" id="workflow">
+  <div class="container">
+    <div class="r"><div class="label">Design philosophy</div>
+    <h2 class="h2">Two Visions<em>.</em></h2>
+    <p class="sub">These tools embody fundamentally different philosophies about how AI should augment human coding.</p></div>
+
+    <div class="split-grid r r-d2">
+      <div class="split-panel split-ws">
+        <div class="panel-header">
+          <div class="panel-icon ws-pi">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+              <path d="M13 2L24 8V18L13 24L2 18V8L13 2Z" fill="rgba(59,109,255,.2)" stroke="rgba(126,163,255,.5)" stroke-width="1"/>
+              <circle cx="13" cy="13" r="3" fill="rgba(126,163,255,.8)"/>
+            </svg>
+          </div>
+          <div class="panel-meta">
+            <div class="panel-title ws-pt">Windsurf</div>
+            <div class="panel-sub">IDE-first · Visual · Ambient</div>
+          </div>
         </div>
-        <div class="radar-score">87</div>
-      </div>
-      <div class="bar-list">
-        <div class="bar-item"><div class="bar-meta"><span>Onboarding Experience</span><span class="bar-val">99%</span></div><div class="bar-track"><div class="bar-fill ws-bar" data-w="99" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Inline Autocomplete</span><span class="bar-val">96%</span></div><div class="bar-track"><div class="bar-fill ws-bar" data-w="96" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Multi-file Reasoning</span><span class="bar-val">85%</span></div><div class="bar-track"><div class="bar-fill ws-bar" data-w="85" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Visual UX & Diff Tools</span><span class="bar-val">97%</span></div><div class="bar-track"><div class="bar-fill ws-bar" data-w="97" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Autonomous Agency</span><span class="bar-val">70%</span></div><div class="bar-track"><div class="bar-fill ws-bar" data-w="70" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Free Tier Value</span><span class="bar-val">95%</span></div><div class="bar-track"><div class="bar-fill ws-bar" data-w="95" style="width:0"></div></div></div>
-      </div>
-      <div class="radar-verdict">Best for developers who live in an IDE and want frictionless, visual AI assistance without leaving their flow.</div>
-    </div>
-
-    <div class="radar-card rcc">
-      <div class="radar-head">
-        <div>
-          <div class="radar-name" style="color:var(--cc2)">Claude Code</div>
-          <div class="radar-tag">by Anthropic · Agentic CLI</div>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="s-num">01</div>
+            <div class="s-body"><div class="s-title">Open your project</div><div class="s-desc">The IDE loads full workspace context automatically — file tree, terminal, git status, open tabs all in scope before you type a word.</div></div>
+          </div>
+          <div class="step-item">
+            <div class="s-num">02</div>
+            <div class="s-body"><div class="s-title">Code with ambient AI</div><div class="s-desc">Ghost text completions appear inline as you type. Supercomplete fills entire function bodies from intent. AI is invisible but always present.</div></div>
+          </div>
+          <div class="step-item">
+            <div class="s-num">03</div>
+            <div class="s-body"><div class="s-title">Invoke Cascade for complexity</div><div class="s-desc">Open the chat panel for multi-file, multi-step tasks. Cascade reasons across your entire codebase and proposes coordinated changes.</div></div>
+          </div>
+          <div class="step-item">
+            <div class="s-num">04</div>
+            <div class="s-body"><div class="s-title">Review changes visually</div><div class="s-desc">Accept, reject, or modify changes in the diff panel. You maintain full editorial control over every line of code that enters your project.</div></div>
+          </div>
         </div>
-        <div class="radar-score">91</div>
       </div>
-      <div class="bar-list">
-        <div class="bar-item"><div class="bar-meta"><span>Onboarding Experience</span><span class="bar-val">72%</span></div><div class="bar-track"><div class="bar-fill cc-bar" data-w="72" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Inline Autocomplete</span><span class="bar-val">55%</span></div><div class="bar-track"><div class="bar-fill cc-bar" data-w="55" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Multi-file Reasoning</span><span class="bar-val">97%</span></div><div class="bar-track"><div class="bar-fill cc-bar" data-w="97" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Visual UX & Diff Tools</span><span class="bar-val">52%</span></div><div class="bar-track"><div class="bar-fill cc-bar" data-w="52" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Autonomous Agency</span><span class="bar-val">98%</span></div><div class="bar-track"><div class="bar-fill cc-bar" data-w="98" style="width:0"></div></div></div>
-        <div class="bar-item"><div class="bar-meta"><span>Free Tier Value</span><span class="bar-val">48%</span></div><div class="bar-track"><div class="bar-fill cc-bar" data-w="48" style="width:0"></div></div></div>
-      </div>
-      <div class="radar-verdict">Best for power users who want to delegate entire engineering tasks and automate their dev pipeline end-to-end.</div>
-    </div>
-  </div>
-</div>
 
-<!-- PRICING -->
-<div class="section">
-  <div class="reveal"><div class="label">Pricing</div>
-  <h2 class="h2">What It Costs</h2>
-  <p class="sub">Real pricing, no spin.</p></div>
-  <div class="price-wrap reveal">
-    <div class="price-card" style="border-color:rgba(124,111,224,.2)">
-      <div class="price-header">
-        <div class="price-icon ws-bg">🌊</div>
-        <div class="price-name ws-pname">Windsurf</div>
-      </div>
-      <div class="price-big" style="background:linear-gradient(135deg,var(--ws),var(--ws2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">$0</div>
-      <div class="price-period">Free forever · Pro $15/mo · Teams $35/mo</div>
-      <ul class="price-feats">
-        <li class="pf"><span class="pf-y">✓</span> 800 Flow Actions/month on Free</li>
-        <li class="pf"><span class="pf-y">✓</span> Unlimited tab completions always free</li>
-        <li class="pf"><span class="pf-y">✓</span> Multi-model: GPT-4o, Claude, Gemini</li>
-        <li class="pf"><span class="pf-y">✓</span> Full VS Code extension compatibility</li>
-        <li class="pf"><span class="pf-y">✓</span> 5,000 actions/mo on Pro ($15)</li>
-        <li class="pf"><span class="pf-n">✗</span> No headless / CI automation mode</li>
-        <li class="pf"><span class="pf-n">✗</span> No MCP server ecosystem</li>
-      </ul>
-    </div>
-    <div class="price-card" style="border-color:rgba(255,107,53,.2)">
-      <div class="price-header">
-        <div class="price-icon cc-bg">⚡</div>
-        <div class="price-name cc-pname">Claude Code</div>
-      </div>
-      <div class="price-big" style="background:linear-gradient(135deg,var(--cc),var(--cc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">$20+</div>
-      <div class="price-period">Claude Pro $20/mo · API usage on top</div>
-      <ul class="price-feats">
-        <li class="pf"><span class="pf-y">✓</span> Full agentic tasks on Claude Pro</li>
-        <li class="pf"><span class="pf-y">✓</span> Git: branches, commits, PRs included</li>
-        <li class="pf"><span class="pf-y">✓</span> MCP servers: GitHub, Slack, DB, APIs</li>
-        <li class="pf"><span class="pf-y">✓</span> Hooks + headless CI/CD pipelines</li>
-        <li class="pf"><span class="pf-y">✓</span> Works with any editor or terminal</li>
-        <li class="pf"><span class="pf-n">✗</span> No meaningful free tier</li>
-        <li class="pf"><span class="pf-n">✗</span> No real-time inline completions</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- VERDICT -->
-<div class="verdict-wrap" id="verdict">
-  <div class="reveal">
-    <div class="label" style="text-align:center">The verdict</div>
-    <h2 class="verdict-title">
-      Not <span style="background:linear-gradient(135deg,var(--ws),var(--ws2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">either/or</span><br>
-      It's <span style="background:linear-gradient(135deg,var(--cc),var(--cc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">both/and</span>
-    </h2>
-    <p class="verdict-desc">The smartest devs in 2025 aren't choosing. They're using Windsurf for real-time flow and Claude Code for autonomous execution.</p>
-  </div>
-  <div class="verdict-grid reveal">
-    <div class="vcard" style="border-color:rgba(124,111,224,.2)">
-      <div class="vcard-label ws-vl">Choose Windsurf when…</div>
-      <div class="vcard-title">You want AI in your flow</div>
-      <div class="vcard-desc">You're actively writing code and want instant, ambient AI assistance without leaving your visual IDE workflow. Ideal for beginners and visual thinkers.</div>
-      <div class="tags">
-        <span class="tag wst">Beginners</span>
-        <span class="tag wst">Visual learners</span>
-        <span class="tag wst">Budget-first</span>
-        <span class="tag wst">Daily coding</span>
-      </div>
-    </div>
-    <div class="vcard" style="border-color:rgba(255,107,53,.2)">
-      <div class="vcard-label cc-vl">Choose Claude Code when…</div>
-      <div class="vcard-title">You want AI to do the work</div>
-      <div class="vcard-desc">You need to hand off an entire feature, refactor a codebase, or automate your engineering pipeline. Built for senior devs who think at architecture level.</div>
-      <div class="tags">
-        <span class="tag cct">Senior devs</span>
-        <span class="tag cct">Complex tasks</span>
-        <span class="tag cct">CI/CD automation</span>
-        <span class="tag cct">Power users</span>
+      <div class="split-panel split-cc">
+        <div class="panel-header">
+          <div class="panel-icon cc-pi">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+              <circle cx="13" cy="13" r="11" fill="rgba(0,176,122,.1)" stroke="rgba(77,217,168,.4)" stroke-width="1"/>
+              <path d="M13 7C9.7 7 7 9.7 7 13C7 16.3 9.7 19 13 19C14.8 19 16.4 18.2 17.6 16.9L15.8 15.1C15 15.9 14.1 16.4 13 16.4C11.1 16.4 9.6 14.9 9.6 13C9.6 11.1 11.1 9.6 13 9.6C14.1 9.6 15 10.1 15.8 10.9L17.6 9.1C16.4 7.8 14.8 7 13 7Z" fill="rgba(77,217,168,.8)"/>
+            </svg>
+          </div>
+          <div class="panel-meta">
+            <div class="panel-title cc-pt">Claude Code</div>
+            <div class="panel-sub">Terminal-first · Autonomous · Complete</div>
+          </div>
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="s-num">01</div>
+            <div class="s-body"><div class="s-title">State your intent</div><div class="s-desc">Describe the goal in plain language. Claude handles task decomposition. You think at the architecture level, not the implementation level.</div></div>
+          </div>
+          <div class="step-item">
+            <div class="s-num">02</div>
+            <div class="s-body"><div class="s-title">Claude reads everything</div><div class="s-desc">Automatically scans your codebase, git history, test suite, and documentation to build a complete picture before writing a single line.</div></div>
+          </div>
+          <div class="step-item">
+            <div class="s-num">03</div>
+            <div class="s-body"><div class="s-title">Autonomous execution loop</div><div class="s-desc">Writes code, runs tests, reads error output, fixes failures, iterates. The loop continues until the task is complete with passing tests.</div></div>
+          </div>
+          <div class="step-item">
+            <div class="s-num">04</div>
+            <div class="s-body"><div class="s-title">Ships without prompting</div><div class="s-desc">Creates git commits with proper messages, opens pull requests, handles the complete development-to-review pipeline autonomously.</div></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- FOOTER -->
+<div class="hr"></div>
+
+<!-- ═══════════════ SCORES ═══════════════ -->
+<div class="section" id="scores">
+  <div class="container">
+    <div class="r"><div class="label">Performance breakdown</div>
+    <h2 class="h2">Category <em>Scores.</em></h2>
+    <p class="sub">Evaluated across six critical dimensions based on documented capabilities and independent testing.</p></div>
+
+    <div class="score-grid r r-d2">
+      <div class="score-card score-ws">
+        <div class="score-head">
+          <div>
+            <div class="score-name ws-sn">Windsurf</div>
+            <div class="score-maker">by Codeium · AI-Native IDE</div>
+          </div>
+          <div>
+            <div class="score-big ws-sb">87<span class="score-den">/100</span></div>
+          </div>
+        </div>
+        <div class="bar-rows">
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Onboarding &amp; Setup</span><span class="bar-pct">99%</span></div>
+            <div class="bar-track"><div class="bar-fill ws-bf" data-w="99" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Inline Autocomplete Quality</span><span class="bar-pct">95%</span></div>
+            <div class="bar-track"><div class="bar-fill ws-bf" data-w="95" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Multi-file Reasoning</span><span class="bar-pct">83%</span></div>
+            <div class="bar-track"><div class="bar-fill ws-bf" data-w="83" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Visual UX &amp; Diff Tools</span><span class="bar-pct">97%</span></div>
+            <div class="bar-track"><div class="bar-fill ws-bf" data-w="97" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Autonomous Agency</span><span class="bar-pct">68%</span></div>
+            <div class="bar-track"><div class="bar-fill ws-bf" data-w="68" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Value (Free Tier)</span><span class="bar-pct">96%</span></div>
+            <div class="bar-track"><div class="bar-fill ws-bf" data-w="96" style="width:0"></div></div>
+          </div>
+        </div>
+        <div class="score-note">Leads the category for visual, IDE-integrated development. Unmatched for real-time assistance and developer onboarding. Trade-off: limited autonomy for complex, multi-step tasks.</div>
+      </div>
+
+      <div class="score-card score-cc">
+        <div class="score-head">
+          <div>
+            <div class="score-name cc-sn">Claude Code</div>
+            <div class="score-maker">by Anthropic · Agentic CLI</div>
+          </div>
+          <div>
+            <div class="score-big cc-sb">91<span class="score-den">/100</span></div>
+          </div>
+        </div>
+        <div class="bar-rows">
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Onboarding &amp; Setup</span><span class="bar-pct">70%</span></div>
+            <div class="bar-track"><div class="bar-fill cc-bf" data-w="70" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Inline Autocomplete Quality</span><span class="bar-pct">52%</span></div>
+            <div class="bar-track"><div class="bar-fill cc-bf" data-w="52" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Multi-file Reasoning</span><span class="bar-pct">97%</span></div>
+            <div class="bar-track"><div class="bar-fill cc-bf" data-w="97" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Visual UX &amp; Diff Tools</span><span class="bar-pct">50%</span></div>
+            <div class="bar-track"><div class="bar-fill cc-bf" data-w="50" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Autonomous Agency</span><span class="bar-pct">98%</span></div>
+            <div class="bar-track"><div class="bar-fill cc-bf" data-w="98" style="width:0"></div></div>
+          </div>
+          <div class="bar-row">
+            <div class="bar-top"><span class="bar-name">Value (Free Tier)</span><span class="bar-pct">45%</span></div>
+            <div class="bar-track"><div class="bar-fill cc-bf" data-w="45" style="width:0"></div></div>
+          </div>
+        </div>
+        <div class="score-note">The clear leader in autonomous task completion and complex reasoning. Best suited for senior engineers and teams who want to delegate entire engineering workflows. Trade-off: no free tier, no visual tooling.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- ═══════════════ PRICING ═══════════════ -->
+<div class="section" id="pricing">
+  <div class="container">
+    <div class="r"><div class="label">Pricing</div>
+    <h2 class="h2">Total Cost of <em>Ownership.</em></h2>
+    <p class="sub">No marketing spin. Here is the real cost breakdown for individual developers and teams.</p></div>
+
+    <div class="pricing-row r r-d2">
+      <div class="price-card price-card-ws">
+        <div class="price-header">
+          <div class="price-icon ws-picon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2L20 7V15L11 20L2 15V7L11 2Z" stroke="rgba(126,163,255,.8)" stroke-width="1" fill="none"/><circle cx="11" cy="11" r="2.5" fill="rgba(126,163,255,.8)"/></svg>
+          </div>
+          <div>
+            <div class="price-name ws-pn">Windsurf</div>
+            <div class="price-plan-tag">FREE · PRO · TEAMS</div>
+          </div>
+        </div>
+        <div class="price-amount ws-pa">$0</div>
+        <div class="price-period">to start — Pro at $15/mo · Teams $35/user/mo</div>
+        <ul class="price-items">
+          <li class="pi"><span class="pi-y">✓</span><span>800 Flow Action credits per month on Free</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Unlimited tab completions — always free</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Multi-model access: GPT-4o, Claude 3.7, Gemini 2.0</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Full VS Code extension compatibility</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>5,000 flow actions/month on Pro ($15)</span></li>
+          <li class="pi"><span class="pi-n">✗</span><span>No headless or CI/CD pipeline mode</span></li>
+          <li class="pi"><span class="pi-n">✗</span><span>No MCP server ecosystem</span></li>
+          <li class="pi"><span class="pi-n">✗</span><span>No persistent project memory</span></li>
+        </ul>
+      </div>
+
+      <div class="price-card price-card-cc">
+        <div class="price-header">
+          <div class="price-icon cc-picon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="rgba(77,217,168,.8)" stroke-width="1" fill="none"/><path d="M11 6C8.2 6 6 8.2 6 11C6 13.8 8.2 16 11 16C12.4 16 13.6 15.4 14.5 14.5L13 13C12.4 13.6 11.8 14 11 14C9.3 14 8 12.7 8 11C8 9.3 9.3 8 11 8C11.8 8 12.4 8.4 13 9L14.5 7.5C13.6 6.6 12.4 6 11 6Z" fill="rgba(77,217,168,.8)"/></svg>
+          </div>
+          <div>
+            <div class="price-name cc-pn">Claude Code</div>
+            <div class="price-plan-tag">PRO · API</div>
+          </div>
+        </div>
+        <div class="price-amount cc-pa">$20<span style="font-size:28px;font-weight:400">+</span></div>
+        <div class="price-period">Claude Pro subscription + API usage on top</div>
+        <ul class="price-items">
+          <li class="pi"><span class="pi-y">✓</span><span>Unlimited agentic task execution on Claude Pro</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Full git workflow: branches, commits, pull requests</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>MCP servers: GitHub, Slack, databases, REST APIs</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Hooks system and full headless CI/CD mode</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Works with any editor — VS Code, JetBrains, Neovim</span></li>
+          <li class="pi"><span class="pi-y">✓</span><span>Persistent project memory via CLAUDE.md</span></li>
+          <li class="pi"><span class="pi-n">✗</span><span>No meaningful free tier for regular usage</span></li>
+          <li class="pi"><span class="pi-n">✗</span><span>No real-time inline autocomplete</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<!-- ═══════════════ VERDICT ═══════════════ -->
+<div id="verdict">
+  <div class="verdict-wrap">
+    <div class="r">
+      <div class="label" style="justify-content:center;margin-bottom:16px">The verdict</div>
+      <h2 class="verdict-h">
+        Not either/or.<br>
+        <span style="color:var(--muted);font-weight:400">It's both.</span>
+      </h2>
+      <p class="verdict-desc">
+        The highest-performing engineers in 2025 are not choosing between these tools. They use Windsurf for real-time ambient coding assistance and Claude Code for autonomous task delegation.
+      </p>
+    </div>
+
+    <div class="verdict-cards r r-d2">
+      <div class="vcard vcard-ws">
+        <div class="vcard-eyebrow ws-ve">Choose Windsurf when</div>
+        <div class="vcard-title">You want AI in your flow state</div>
+        <div class="vcard-desc">You are actively writing code and want intelligent, real-time assistance without ever leaving your visual IDE workflow. The optimal choice for teams, beginners, and developers who prefer reviewing changes before they land.</div>
+        <div class="vtags">
+          <span class="vtag ws-vt">Beginners</span>
+          <span class="vtag ws-vt">Visual workflows</span>
+          <span class="vtag ws-vt">Team environments</span>
+          <span class="vtag ws-vt">Budget-conscious</span>
+          <span class="vtag ws-vt">Daily active coding</span>
+        </div>
+      </div>
+      <div class="vcard vcard-cc">
+        <div class="vcard-eyebrow cc-ve">Choose Claude Code when</div>
+        <div class="vcard-title">You want to delegate entire tasks</div>
+        <div class="vcard-desc">You need to hand off a complete feature, architectural refactor, or engineering pipeline. Claude Code operates at the level of a senior engineer, reasoning across your entire codebase and shipping work end-to-end.</div>
+        <div class="vtags">
+          <span class="vtag cc-vt">Senior engineers</span>
+          <span class="vtag cc-vt">Complex tasks</span>
+          <span class="vtag cc-vt">CI/CD automation</span>
+          <span class="vtag cc-vt">Power users</span>
+          <span class="vtag cc-vt">Pipeline automation</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
 <footer>
-  <span>Built with Claude Code ⚡ · Deployed on Vercel</span>
-  <span style="color:var(--vdim)">Not affiliated with Codeium or Anthropic · 2025</span>
+  <span>Built with Claude Code</span>
+  <span style="color:var(--faint)">Independent analysis · Not affiliated with Codeium or Anthropic · 2025</span>
+  <span>vs.sphost.online</span>
 </footer>
 
 <script>
-// CURSOR
-const cur = document.getElementById('cursor');
-const ring = document.getElementById('cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
-function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing)}
-animRing();
-document.querySelectorAll('a,button').forEach(el=>{
-  el.addEventListener('mouseenter',()=>{cur.style.width='20px';cur.style.height='20px';ring.style.width='48px';ring.style.height='48px'});
-  el.addEventListener('mouseleave',()=>{cur.style.width='12px';cur.style.height='12px';ring.style.width='36px';ring.style.height='36px'});
+/* CURSOR */
+const cur=document.getElementById('cur'),curO=document.getElementById('cur-o');
+let mx=0,my=0,ox=0,oy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.cssText+=`;left:${mx}px;top:${my}px`});
+function tick(){ox+=(mx-ox)*.1;oy+=(my-oy)*.1;curO.style.cssText+=`;left:${ox}px;top:${oy}px`;requestAnimationFrame(tick)}tick();
+document.querySelectorAll('a,button,.vcard,.score-card,.price-card,.metric,.step-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';curO.style.width='48px';curO.style.height='48px'});
+  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';curO.style.width='34px';curO.style.height='34px'});
 });
 
-// HERO CANVAS
-const hc = document.getElementById('hero-canvas');
-const hctx = hc.getContext('2d');
-let HW,HH;
-function resizeHC(){HW=hc.width=hc.offsetWidth;HH=hc.height=hc.offsetHeight}
-resizeHC();
-window.addEventListener('resize',resizeHC);
-
-const NODES=[];
-class Node{
-  constructor(){
-    this.x=Math.random()*HW;this.y=Math.random()*HH;
-    this.vx=(Math.random()-.5)*.5;this.vy=(Math.random()-.5)*.5;
-    this.r=Math.random()*2+.5;
-    this.side=Math.random()>.5?'ws':'cc';
-    this.a=Math.random()*.5+.1;
-  }
-  update(){
-    this.x+=this.vx;this.y+=this.vy;
-    if(this.x<0||this.x>HW){this.vx*=-1}
-    if(this.y<0||this.y>HH){this.vy*=-1}
-  }
-  draw(){
-    hctx.beginPath();
-    hctx.arc(this.x,this.y,this.r,0,Math.PI*2);
-    hctx.fillStyle=this.side==='ws'?`rgba(124,111,224,${this.a})`:`rgba(255,107,53,${this.a})`;
-    hctx.fill();
-  }
-}
-for(let i=0;i<180;i++)NODES.push(new Node());
-
-function drawEdges(){
-  for(let i=0;i<NODES.length;i++){
-    for(let j=i+1;j<NODES.length;j++){
-      const dx=NODES[i].x-NODES[j].x,dy=NODES[i].y-NODES[j].y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<120){
-        const a=(1-d/120)*.06;
-        hctx.beginPath();
-        hctx.moveTo(NODES[i].x,NODES[i].y);
-        hctx.lineTo(NODES[j].x,NODES[j].y);
-        if(NODES[i].side===NODES[j].side){
-          hctx.strokeStyle=NODES[i].side==='ws'?`rgba(124,111,224,${a})`:`rgba(255,107,53,${a})`;
-        } else {
-          hctx.strokeStyle=`rgba(255,255,255,${a*.4})`;
-        }
-        hctx.lineWidth=.6;hctx.stroke();
-      }
-    }
-  }
-}
-
-// pulsing rings at logo positions
-let t=0;
-function drawRings(){
-  t+=.01;
-  const positions=[
-    {x:HW/2-160,y:HH/2-80,c:'124,111,224'},
-    {x:HW/2+160,y:HH/2-80,c:'255,107,53'}
-  ];
-  positions.forEach(p=>{
-    for(let r=0;r<3;r++){
-      const phase=(t+(r*.33))%(1);
-      const rad=60+phase*120;
-      const a=(1-phase)*.06;
-      hctx.beginPath();
-      hctx.arc(p.x,p.y,rad,0,Math.PI*2);
-      hctx.strokeStyle=`rgba(${p.c},${a})`;
-      hctx.lineWidth=1;hctx.stroke();
-    }
-  });
-}
-
-function hcLoop(){
-  hctx.clearRect(0,0,HW,HH);
-  drawEdges();
-  drawRings();
-  NODES.forEach(n=>{n.update();n.draw()});
-  requestAnimationFrame(hcLoop);
-}
-hcLoop();
-
-// INTERSECTION OBSERVER
-const obs=new IntersectionObserver(entries=>{
+/* REVEAL */
+const revObs=new IntersectionObserver(entries=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
-      e.target.classList.add('in');
-      // bars
-      e.target.querySelectorAll('.bar-fill[data-w]').forEach(b=>{
-        setTimeout(()=>{b.style.width=b.dataset.w+'%'},150);
-      });
-      obs.unobserve(e.target);
+      e.target.classList.add('on');
+      e.target.querySelectorAll('.bar-fill[data-w]').forEach(b=>setTimeout(()=>{b.style.width=b.dataset.w+'%'},200));
+      revObs.unobserve(e.target);
     }
   });
 },{threshold:.08});
-document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el=>obs.observe(el));
+document.querySelectorAll('.r,.r-l,.r-r').forEach(el=>revObs.observe(el));
 
-// COUNTERS
-function counter(el,target,sfx){
-  let c=0;const s=Math.max(1,Math.floor(target/50));
-  const t=setInterval(()=>{c=Math.min(c+s,target);el.textContent=c+sfx;if(c>=target)clearInterval(t)},20);
+/* COUNTERS */
+function runCounter(el,target){
+  let v=0;const step=Math.max(1,Math.floor(target/55));
+  const t=setInterval(()=>{v=Math.min(v+step,target);el.textContent=v+(target===100?'%':'+');if(v>=target)clearInterval(t);},18);
 }
 const cntObs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const el=e.target;
-      const v=parseInt(el.dataset.count);
-      const sfx=v===100?'%':v===60?'+':'+';
-      counter(el,v,sfx);
-      cntObs.unobserve(el);
-    }
-  });
+  entries.forEach(e=>{if(e.isIntersecting){runCounter(e.target,+e.target.dataset.count);cntObs.unobserve(e.target);}});
 },{threshold:.5});
 document.querySelectorAll('[data-count]').forEach(el=>cntObs.observe(el));
 
-// SMOOTH SCROLL
+/* SMOOTH SCROLL */
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     e.preventDefault();
-    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth'});
   });
 });
 
-// PARALLAX hero
+/* PARALLAX HERO */
 window.addEventListener('scroll',()=>{
   const y=window.scrollY;
   const inner=document.querySelector('.hero-inner');
-  if(inner)inner.style.transform=`translateY(${y*.3}px)`;
-});
+  if(inner&&y<window.innerHeight)inner.style.transform=`translateY(${y*.25}px)`;
+},{passive:true});
 </script>
 </body>
 </html>
